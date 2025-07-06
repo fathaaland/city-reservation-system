@@ -1,4 +1,6 @@
 package com.city.reservation.CityReservationSystem.model.enums;
 
-public class Role {
+public enum Role {
+    USER,
+    ADMIN
 }

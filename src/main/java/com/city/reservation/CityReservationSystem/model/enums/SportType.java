@@ -1,4 +1,9 @@
 package com.city.reservation.CityReservationSystem.model.enums;
 
-public class SportType {
+public enum SportType {
+    TENNIS,
+    FOOTBALL,
+    GYM,
+    SWIMMING,
+    BASKETBALL
 }

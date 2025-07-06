@@ -1,4 +1,6 @@
-package com.example.sportreservation.model.entity;
+package com.city.reservation.CityReservationSystem.model.entity;
+
+
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +21,7 @@ public class Reservation {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
-    private com.example.sportreservation.model.entity.User user;
+    private User user;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "sport_facility_id")
