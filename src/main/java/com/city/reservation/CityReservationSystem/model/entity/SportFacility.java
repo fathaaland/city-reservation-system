@@ -1,6 +1,5 @@
-package com.example.sportreservation.model.entity;
+package com.city.reservation.CityReservationSystem.model.entity;
 
-import com.city.reservation.CityReservationSystem.model.entity.Reservation;
 import com.city.reservation.CityReservationSystem.model.enums.SportType;
 import jakarta.persistence.*;
 import lombok.*;
