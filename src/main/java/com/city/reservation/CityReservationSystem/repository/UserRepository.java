@@ -1,4 +1,4 @@
 package com.city.reservation.CityReservationSystem.repository;
 
-public class UserRepository {
+public interface UserRepository {
 }
