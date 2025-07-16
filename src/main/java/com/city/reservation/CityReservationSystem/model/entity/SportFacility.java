@@ -31,6 +31,19 @@ public class SportFacility {
     @Column(length = 500)
     private String description;
 
+    @Column(name = "contact_number", nullable = false)
+    private String contactNumber;
+
+    @Column(nullable = false)
+    private int capacity;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "address", nullable = false)
+    private String address;
+
     @OneToMany(mappedBy = "sportFacility", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
+
 }

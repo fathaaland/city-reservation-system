@@ -10,6 +10,31 @@ import org.springframework.stereotype.Service;
 public class FacilityService implements IFacilityService {
     private final FacilityRepository facilityRepository;
 
+
+//    private Product createProduct(AddProductRequest request, Category category) {
+//        return new Product(
+//                request.getName(),
+//                request.getBrand(),
+//                request.getDescription(),
+//                request.getPrice(),
+//                request.getInventory(),
+//                category
+//        );
+//    }
+
+    private SportFacility createFacility(SportFacility facility) {
+        return new SportFacility(
+                facility.getName(),
+                facility.getType(),
+                facility.getDescription(),
+                facility.getAddress(),
+                facility.getContactNumber(),
+                facility.getCapacity(),
+                facility.getImageUrl()
+        );
+    }
+
+
     @Override
     public SportFacility addFacility(SportFacility facility) {
         return null;
