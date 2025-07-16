@@ -10,4 +10,5 @@ public interface IFacilityService {
     Iterable<SportFacility> getAllFacilities();
     Iterable<SportFacility> getFacilitiesByType(String type);
     Iterable<SportFacility> getFacilitiesByName(String name);
+
 }
