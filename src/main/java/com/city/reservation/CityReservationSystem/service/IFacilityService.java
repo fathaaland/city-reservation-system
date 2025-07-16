@@ -9,6 +9,5 @@ public interface IFacilityService {
     SportFacility updateFacility(Long facilityId, SportFacility facility);
     Iterable<SportFacility> getAllFacilities();
     Iterable<SportFacility> getFacilitiesByType(String type);
-    Iterable<SportFacility> getFacilitiesByLocation(String location);
     Iterable<SportFacility> getFacilitiesByName(String name);
 }
