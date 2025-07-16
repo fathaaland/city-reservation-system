@@ -31,4 +31,5 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDateTime endTime;
 
+
 }
