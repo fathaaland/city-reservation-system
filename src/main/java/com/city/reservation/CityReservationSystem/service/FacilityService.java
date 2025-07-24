@@ -28,7 +28,12 @@ public class FacilityService implements IFacilityService {
 
     @Override
     public SportFacility addFacility(SportFacility facility) {
-        return null;
+        try{
+            SportFacility newFacility = createFacility(facility);
+            return facilityRepository.save(newFacility);
+        } catch (Exception e) {
+            throw new RuntimeException("Error adding facility: " + e.getMessage(), e);
+        }
     }
 
     @Override
