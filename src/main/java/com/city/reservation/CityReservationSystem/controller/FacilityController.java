@@ -14,7 +14,7 @@ public class FacilityController {
 
     private final FacilityService facilityService;
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<SportFacility> addFacility(@RequestBody SportFacility facility) {
         SportFacility createdFacility = facilityService.addFacility(facility);
         return new ResponseEntity<>(createdFacility, HttpStatus.CREATED);
