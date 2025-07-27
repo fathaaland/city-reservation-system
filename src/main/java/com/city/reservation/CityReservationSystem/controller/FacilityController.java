@@ -19,4 +19,16 @@ public class FacilityController {
         SportFacility createdFacility = facilityService.addFacility(facility);
         return new ResponseEntity<>(createdFacility, HttpStatus.CREATED);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SportFacility> getFacilityById(@PathVariable Long id) {
+        SportFacility facility = facilityService.getFacilityById(id);
+        if (facility != null) {
+            return new ResponseEntity<>(facility, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
 }
