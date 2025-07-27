@@ -31,4 +31,15 @@ public class FacilityController {
 
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFacilityById(@PathVariable Long id) {
+        try {
+            facilityService.deleteFacilityById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+
+    }
 }
