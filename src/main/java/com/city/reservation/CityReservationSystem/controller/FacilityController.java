@@ -31,7 +31,7 @@ public class FacilityController {
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete{id}")
     public ResponseEntity<Void> deleteFacilityById(@PathVariable Long id) {
         try {
             facilityService.deleteFacilityById(id);
@@ -39,6 +39,17 @@ public class FacilityController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
+        }
+
+    }
+
+    @PutMapping("/update/{facilityId}")
+    public ResponseEntity<SportFacility> updateFacility(@PathVariable Long facilityId, @RequestBody SportFacility facility) {
+        try {
+            SportFacility updatedFacility = facilityService.updateFacility(facilityId, facility);
+            return new ResponseEntity<>(updatedFacility, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
