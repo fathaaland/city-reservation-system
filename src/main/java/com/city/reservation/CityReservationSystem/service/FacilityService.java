@@ -1,10 +1,12 @@
 package com.city.reservation.CityReservationSystem.service;
 
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
+import com.city.reservation.CityReservationSystem.model.enums.SportType;
 import com.city.reservation.CityReservationSystem.repository.FacilityRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -60,13 +62,22 @@ public class FacilityService implements IFacilityService {
         return facilityRepository.findAll();
     }
 
+
     @Override
-    public Iterable<SportFacility> getFacilitiesByType(String type) {
-        return null;
+    public Iterable<SportFacility> getFacilitiesByType(SportType type) {
+        if (facilityRepository.existsByType(type)) {
+            return facilityRepository.findByType(type);
+        } else {
+            throw new RuntimeException("No facilities found for type: " + type);
+        }
     }
 
     @Override
     public Iterable<SportFacility> getFacilitiesByName(String name) {
-        return null;
+        if (facilityRepository.existsByName(name)) {
+            return Collections.singleton(facilityRepository.findByName(name));
+        } else {
+            throw new RuntimeException("No facilities found with name: " + name);
+        }
     }
 }

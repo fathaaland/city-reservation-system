@@ -1,6 +1,7 @@
 package com.city.reservation.CityReservationSystem.controller;
 
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
+import com.city.reservation.CityReservationSystem.model.enums.SportType;
 import com.city.reservation.CityReservationSystem.service.FacilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -62,5 +63,17 @@ public class FacilityController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/type/{type}")
+    public ResponseEntity<Iterable<SportFacility>> getFacilitiesByType(@PathVariable SportType type) {
+        Iterable<SportFacility> facilities = facilityService.getFacilitiesByType(type);
+        if (facilities != null) {
+            return new ResponseEntity<>(facilities, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        }
+
     }
 }
