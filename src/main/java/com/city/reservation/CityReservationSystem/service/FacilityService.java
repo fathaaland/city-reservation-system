@@ -38,7 +38,8 @@ public class FacilityService implements IFacilityService {
 
     @Override
     public SportFacility getFacilityById(Long id) {
-        return null;
+        return facilityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Facility not found with id: " + id));
     }
 
     @Override
