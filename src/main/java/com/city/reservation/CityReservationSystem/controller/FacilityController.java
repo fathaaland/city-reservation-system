@@ -31,7 +31,7 @@ public class FacilityController {
 
     }
 
-    @DeleteMapping("/delete{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteFacilityById(@PathVariable Long id) {
         try {
             facilityService.deleteFacilityById(id);
@@ -52,5 +52,15 @@ public class FacilityController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Iterable<SportFacility>> getAllFacilities() {
+        Iterable<SportFacility> facilities = facilityService.getAllFacilities();
+        if (facilities != null) {
+            return new ResponseEntity<>(facilities, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

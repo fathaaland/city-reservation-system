@@ -44,7 +44,10 @@ public class FacilityService implements IFacilityService {
 
     @Override
     public void deleteFacilityById(Long id) {
-
+        if (!facilityRepository.existsById(id)) {
+            throw new RuntimeException("Facility not found with id: " + id);
+        }
+        facilityRepository.deleteById(id);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class FacilityService implements IFacilityService {
 
     @Override
     public Iterable<SportFacility> getAllFacilities() {
-        return null;
+        return facilityRepository.findAll();
     }
 
     @Override
