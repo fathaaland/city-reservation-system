@@ -54,7 +54,19 @@ public class FacilityService implements IFacilityService {
 
     @Override
     public SportFacility updateFacility(Long facilityId, SportFacility facility) {
-        return null;
+        if (!facilityRepository.existsById(facilityId)) {
+            throw new RuntimeException("Facility not found with id: " + facilityId);
+        }
+        SportFacility existingFacility = facilityRepository.findById(facilityId)
+                .orElseThrow(() -> new RuntimeException("Facility not found with id: " + facilityId));
+        existingFacility.setName(facility.getName());
+        existingFacility.setType(facility.getType());
+        existingFacility.setDescription(facility.getDescription());
+        existingFacility.setAddress(facility.getAddress());
+        existingFacility.setContactNumber(facility.getContactNumber());
+        existingFacility.setCapacity(facility.getCapacity());
+        existingFacility.setImageUrl(facility.getImageUrl());
+        return facilityRepository.save(existingFacility);
     }
 
     @Override
