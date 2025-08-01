@@ -27,19 +27,6 @@ public class ReservationService implements IReservationService  {
     @Override
     public Reservation addReservation(Reservation reservation) {
         try {
-            if (reservationRepository.findById(reservation.getId()).isEmpty()) {
-                throw new RuntimeException("User or Facility not found");
-            }
-            if (reservation.getStartTime().isAfter(reservation.getEndTime())) {
-                throw new RuntimeException("Start time must be before end time");
-            }
-            if (reservation.getStartTime().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Start time cannot be in the past");
-            }
-            if (reservation.getEndTime().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("End time cannot be in the past");
-            }
-
             Reservation newReservation = createReservation(reservation);
             return reservationRepository.save(newReservation);
         } catch (Exception e) {
