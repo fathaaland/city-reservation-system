@@ -10,13 +10,30 @@ import org.springframework.stereotype.Service;
 public class UserService implements IUserService {
  private final UserRepository userRepository;
 
-    @Override
-    public User findUserByUsername(String username) {
-        return null;
+ public User createUser(User user) {
+        return User.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .reservations(user.getReservations())
+                .build();
     }
+
 
     @Override
     public User addUser(User user) {
+     try{
+         User newUser = createUser(user);
+         return userRepository.save(newUser);
+     }catch(Exception e) {
+         throw new RuntimeException("Error adding user: " + e.getMessage(), e);
+     }
+    }
+
+
+    @Override
+    public User findUserByUsername(String username) {
         return null;
     }
 
