@@ -1,9 +1,11 @@
 package com.city.reservation.CityReservationSystem.controller;
 
+import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/add")
-    public User addUser(User user){
+    public User addUser(@RequestBody User user){
         try{
             if (user == null || user.getUsername() == null || user.getEmail() == null || user.getPassword() == null) {
                 throw new IllegalArgumentException("User details are incomplete");
