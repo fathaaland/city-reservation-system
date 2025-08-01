@@ -36,7 +36,8 @@ public class ReservationService implements IReservationService  {
 
     @Override
     public Reservation getReservationById(Long id) {
-        return null;
+        return reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
     }
 
     @Override

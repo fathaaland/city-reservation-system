@@ -7,10 +7,7 @@ import com.city.reservation.CityReservationSystem.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +29,19 @@ public class ReservationController {
             return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to add reservation: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Reservation> getReservationById(@PathVariable Long id) {
+        try {
+            if (id == null || id <= 0) {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
+            Reservation reservation = reservationService.getReservationById(id);
+            return new ResponseEntity<>(reservation, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 }
