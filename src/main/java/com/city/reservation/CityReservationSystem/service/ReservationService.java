@@ -5,6 +5,7 @@ import com.city.reservation.CityReservationSystem.repository.ReservationReposito
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -13,9 +14,37 @@ public class ReservationService implements IReservationService  {
     private final ReservationRepository reservationRepository;
 
 
+
+    private Reservation createReservation(Reservation reservation){
+        return Reservation.builder()
+                .user(reservation.getUser())
+                .sportFacility(reservation.getSportFacility())
+                .startTime(reservation.getStartTime())
+                .endTime(reservation.getEndTime())
+                .build();
+    }
+
     @Override
     public Reservation addReservation(Reservation reservation) {
-        return null;
+        try {
+            if (reservationRepository.findById(reservation.getId()).isEmpty()) {
+                throw new RuntimeException("User or Facility not found");
+            }
+            if (reservation.getStartTime().isAfter(reservation.getEndTime())) {
+                throw new RuntimeException("Start time must be before end time");
+            }
+            if (reservation.getStartTime().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Start time cannot be in the past");
+            }
+            if (reservation.getEndTime().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("End time cannot be in the past");
+            }
+
+            Reservation newReservation = createReservation(reservation);
+            return reservationRepository.save(newReservation);
+        } catch (Exception e) {
+            throw new RuntimeException("Error adding reservation: " + e.getMessage(), e);
+        }
     }
 
     @Override
