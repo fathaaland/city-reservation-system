@@ -1,6 +1,7 @@
 package com.city.reservation.CityReservationSystem.model.entity;
 
 import com.city.reservation.CityReservationSystem.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,5 +33,6 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Reservation> reservations;
 }
