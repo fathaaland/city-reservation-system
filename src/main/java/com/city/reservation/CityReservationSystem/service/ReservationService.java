@@ -43,6 +43,9 @@ public class ReservationService implements IReservationService  {
     @Override
     public void deleteReservationById(Long id) {
         try {
+            if (!reservationRepository.existsById(id)) {
+                throw new RuntimeException("Reservation not found with id: " + id);
+            }
             reservationRepository.deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException("Error deleting reservation with id: " + id + " - " + e.getMessage(), e);

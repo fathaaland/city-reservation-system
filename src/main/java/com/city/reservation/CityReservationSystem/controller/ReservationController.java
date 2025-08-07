@@ -18,11 +18,11 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-   @PostMapping("/add")
+    @PostMapping("/add")
     public ResponseEntity<?> addReservation(@RequestBody Reservation reservation) {
         try {
             if (reservation == null || reservation.getUser() == null || reservation.getSportFacility() == null ||
-                reservation.getStartTime() == null || reservation.getEndTime() == null) {
+                    reservation.getStartTime() == null || reservation.getEndTime() == null) {
                 return new ResponseEntity<>("Missing required fields", HttpStatus.BAD_REQUEST);
             }
             Reservation createdReservation = reservationService.addReservation(reservation);
@@ -44,4 +44,18 @@ public class ReservationController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteReservationById(@PathVariable Long id) {
+        try {
+            if(reservationService.getReservationById(id) == null || id <= 0) {
+                return new ResponseEntity<>("Reservation not found", HttpStatus.NOT_FOUND);
+            }
+            reservationService.deleteReservationById(id);
+            return new ResponseEntity<>("Reservation deleted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to delete reservation: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
