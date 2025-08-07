@@ -1,9 +1,13 @@
 package com.city.reservation.CityReservationSystem.service;
 
 import com.city.reservation.CityReservationSystem.model.entity.Reservation;
+import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
+import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.repository.ReservationRepository;
+import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.city.reservation.CityReservationSystem.repository.FacilityRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,17 +16,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationService implements IReservationService  {
     private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
+    private final FacilityRepository FacilityRepository;
 
 
 
-    private Reservation createReservation(Reservation reservation){
+
+    private Reservation createReservation(Reservation reservation) {
+        Long userId = reservation.getUser().getId();
+        Long facilityId = reservation.getSportFacility().getId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        SportFacility sportFacility = FacilityRepository.findById(facilityId)
+                .orElseThrow(() -> new RuntimeException("Sport facility not found with id: " + facilityId));
+
         return Reservation.builder()
-                .user(reservation.getUser())
-                .sportFacility(reservation.getSportFacility())
+                .user(user)
+                .sportFacility(sportFacility)
                 .startTime(reservation.getStartTime())
                 .endTime(reservation.getEndTime())
                 .build();
     }
+
 
     @Override
     public Reservation addReservation(Reservation reservation) {
@@ -36,8 +52,16 @@ public class ReservationService implements IReservationService  {
 
     @Override
     public Reservation getReservationById(Long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+      try{
+          if (!reservationRepository.existsById(id)) {
+              throw new RuntimeException("Reservation not found with id: " + id);
+          }
+
+            return reservationRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+    }catch (Exception e){
+            throw new RuntimeException("Error retrieving reservation with id: " + id + " - " + e.getMessage(), e);
+      }
     }
 
     @Override

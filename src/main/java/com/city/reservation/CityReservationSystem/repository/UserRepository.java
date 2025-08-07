@@ -4,7 +4,7 @@ import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User,Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
 
     boolean existsByEmail(String email);

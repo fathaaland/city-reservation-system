@@ -1,6 +1,7 @@
 package com.city.reservation.CityReservationSystem.model.entity;
 
 import com.city.reservation.CityReservationSystem.model.enums.SportType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,6 +45,7 @@ public class SportFacility {
     private String address;
 
     @OneToMany(mappedBy = "sportFacility", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Reservation> reservations;
 
 }
