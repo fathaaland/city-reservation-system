@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/reservation")
@@ -55,6 +56,19 @@ public class ReservationController {
             return new ResponseEntity<>("Reservation deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to delete reservation: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Reservation>> getAllReservations() {
+        try {
+            List<Reservation> reservations = reservationService.getAllReservations();
+            if (reservations.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(reservations, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
