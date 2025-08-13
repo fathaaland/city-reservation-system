@@ -2,6 +2,7 @@ package com.city.reservation.CityReservationSystem.controller;
 
 import com.city.reservation.CityReservationSystem.model.entity.Reservation;
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
+import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import com.city.reservation.CityReservationSystem.service.FacilityService;
 import com.city.reservation.CityReservationSystem.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final UserRepository userRepository;
 
     @PostMapping("/add")
     public ResponseEntity<?> addReservation(@RequestBody Reservation reservation) {
@@ -49,7 +51,7 @@ public class ReservationController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteReservationById(@PathVariable Long id) {
         try {
-            if(reservationService.getReservationById(id) == null || id <= 0) {
+            if (reservationService.getReservationById(id) == null || id <= 0) {
                 return new ResponseEntity<>("Reservation not found", HttpStatus.NOT_FOUND);
             }
             reservationService.deleteReservationById(id);
@@ -71,5 +73,26 @@ public class ReservationController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getReservationsByUserId(@PathVariable Long userId) {
+        if (userId == null || userId <= 0) {
+            return ResponseEntity.badRequest().body("Invalid user ID");
+        }
+
+        try {
+            List<Reservation> reservations = reservationService.getReservationsByUserId(userId);
+            if (reservations.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(reservations);
+        } catch (RuntimeException e) {
+            if (e.getMessage().startsWith("User not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 
 }

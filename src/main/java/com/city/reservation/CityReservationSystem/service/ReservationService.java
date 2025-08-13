@@ -85,7 +85,6 @@ public class ReservationService implements IReservationService  {
     @Override
     public List<Reservation> getAllReservations() {
         try {
-
             if (reservationRepository.count() == 0) {
                 throw new RuntimeException("No reservations found.");
             }
@@ -98,8 +97,16 @@ public class ReservationService implements IReservationService  {
 
     @Override
     public List<Reservation> getReservationsByUserId(Long userId) {
-        return List.of();
+        try {
+            if (!userRepository.existsById(userId)) {
+                throw new RuntimeException("User not found with id: " + userId);
+            }
+            return reservationRepository.findByUserId(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving reservations for user with id: " + userId + " - " + e.getMessage(), e);
+        }
     }
+
 
     @Override
     public List<Reservation> getReservationsByFacilityId(Long facilityId) {
