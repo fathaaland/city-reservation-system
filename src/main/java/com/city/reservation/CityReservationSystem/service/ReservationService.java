@@ -77,10 +77,7 @@ public class ReservationService implements IReservationService  {
 
     }
 
-    @Override
-    public Reservation updateReservation(Long reservationId, Reservation reservation) {
-        return null;
-    }
+
 
     @Override
     public List<Reservation> getAllReservations() {
@@ -107,10 +104,17 @@ public class ReservationService implements IReservationService  {
         }
     }
 
-
     @Override
     public List<Reservation> getReservationsByFacilityId(Long facilityId) {
-        return List.of();
+        try{
+            if(!FacilityRepository.existsById(facilityId)) {
+                throw new RuntimeException("Facility not found with id: " + facilityId);
+            }
+
+            return reservationRepository.findBySportFacilityId(facilityId);
+        }catch (Exception e) {
+            throw new RuntimeException("Error retrieving reservations for facility with id: " + facilityId + " - " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -136,5 +140,10 @@ public class ReservationService implements IReservationService  {
     @Override
     public List<Reservation> getReservationsByFacilityIdAndDate(Long facilityId, String date) {
         return List.of();
+    }
+
+    @Override
+    public Reservation updateReservation(Long reservationId, Reservation reservation) {
+        return null;
     }
 }

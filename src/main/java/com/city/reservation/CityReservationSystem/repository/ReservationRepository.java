@@ -10,4 +10,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsById(long id);
 
     List<Reservation> findByUserId(Long userId);
+
+    List<Reservation> findBySportFacilityId(Long facilityId);
 }
