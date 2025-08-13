@@ -94,5 +94,25 @@ public class ReservationController {
         }
     }
 
+    @GetMapping("/facility/{facilityId}")
+    public ResponseEntity<?> getReservationsByFacilityId(@PathVariable Long facilityId) {
+        if (facilityId == null || facilityId <= 0) {
+            return ResponseEntity.badRequest().body("Invalid facility ID");
+        }
+
+        try {
+            List<Reservation> reservations = reservationService.getReservationsByFacilityId(facilityId);
+            if (reservations.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(reservations);
+        } catch (RuntimeException e) {
+            if (e.getMessage().startsWith("Facility not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 
 }
