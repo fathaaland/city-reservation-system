@@ -84,7 +84,16 @@ public class ReservationService implements IReservationService  {
 
     @Override
     public List<Reservation> getAllReservations() {
-        return List.of();
+        try {
+
+            if (reservationRepository.count() == 0) {
+                throw new RuntimeException("No reservations found.");
+            }
+
+            return reservationRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving all reservations: " + e.getMessage(), e);
+        }
     }
 
     @Override
