@@ -77,8 +77,6 @@ public class ReservationService implements IReservationService  {
 
     }
 
-
-
     @Override
     public List<Reservation> getAllReservations() {
         try {
@@ -119,7 +117,14 @@ public class ReservationService implements IReservationService  {
 
     @Override
     public List<Reservation> getReservationsByDate(String date) {
-        return List.of();
+        try{
+            LocalDateTime startOfDay = LocalDateTime.parse(date + "T00:00:00");
+            LocalDateTime endOfDay = LocalDateTime.parse(date + "T23:59:59");
+
+            return reservationRepository.findByStartTimeBetween(startOfDay, endOfDay);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
