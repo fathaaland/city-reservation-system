@@ -1,6 +1,5 @@
 package com.city.reservation.CityReservationSystem.exceptions;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.internalServerError().body(ex.getMessage());
+        return ResponseEntity.internalServerError().body("Unknown runtime error" + ex.getMessage());
     }
 }
