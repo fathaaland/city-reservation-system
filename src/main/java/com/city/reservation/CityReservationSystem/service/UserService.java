@@ -35,6 +35,7 @@ public class UserService implements IUserService {
     public User getUserById(Long id) {
         try{
             return userRepository.findById(id).orElse(null);
+
     } catch (Exception e) {
             throw new RuntimeException("Error getting user: " + e.getMessage(), e);
         }
