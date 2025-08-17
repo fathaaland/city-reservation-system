@@ -31,16 +31,22 @@ public class UserService implements IUserService {
      }
     }
 
+    @Override
+    public User getUserById(Long id) {
+        try{
+            return userRepository.findById(id).orElse(null);
+    } catch (Exception e) {
+            throw new RuntimeException("Error getting user: " + e.getMessage(), e);
+        }
+    }
+
 
     @Override
     public User findUserByUsername(String username) {
         return null;
     }
 
-    @Override
-    public User getUserById(Long id) {
-        return null;
-    }
+
 
     @Override
     public void deleteUserById(Long id) {
