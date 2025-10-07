@@ -128,6 +128,24 @@ public class ReservationService implements IReservationService  {
     }
 
     @Override
+    public Reservation updateReservation(Long reservationId, Reservation reservation) {
+        try {
+            if (!reservationRepository.existsById(reservationId)) {
+                throw new RuntimeException("Reservation not found with id: " + reservationId);
+            }
+            Reservation existingReservation = reservationRepository.findById(reservationId)
+                    .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
+
+            existingReservation.setStartTime(reservation.getStartTime());
+            existingReservation.setEndTime(reservation.getEndTime());
+
+            return reservationRepository.save(existingReservation);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating reservation with id: " + reservationId + " - " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public List<Reservation> getReservationsByUserIdAndFacilityId(Long userId, Long facilityId) {
         return List.of();
     }
@@ -147,8 +165,5 @@ public class ReservationService implements IReservationService  {
         return List.of();
     }
 
-    @Override
-    public Reservation updateReservation(Long reservationId, Reservation reservation) {
-        return null;
-    }
+
 }
