@@ -4,6 +4,8 @@ import com.city.reservation.CityReservationSystem.exceptions.EntityNotFoundExcep
 import com.city.reservation.CityReservationSystem.exceptions.IllegalArgumentException;
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.service.UserService;
+import com.city.reservation.CityReservationSystem.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,17 +46,33 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<User> deleteUser(@PathVariable Long userId) {
-        try{
-            if(findUserById(userId) == null || userId <= 0) {
-                throw new EntityNotFoundException("User not found");
-            } else {
-                userService.deleteUserById(userId);
-                return ResponseEntity.ok().build();
-            }
-        } catch (Exception e) {
-            throw new EntityNotFoundException(e.getMessage());
-            }
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        if (userId <= 0) {
+            return ResponseEntity.badRequest().body("Invalid user ID");
         }
 
+        try {
+            userService.deleteUserById(userId);
+            return ResponseEntity.ok("User deleted successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
+
+
+    @GetMapping("/by-username/{userName}")
+    public ResponseEntity<User> findUserByUsername(@PathVariable String userName) {
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        User user = userService.findUserByUsername(userName);
+        if (user == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        return ResponseEntity.ok(user);
+    }
+
+
+}

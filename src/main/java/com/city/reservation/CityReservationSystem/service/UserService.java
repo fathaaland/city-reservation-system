@@ -2,6 +2,7 @@ package com.city.reservation.CityReservationSystem.service;
 
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +44,9 @@ public class UserService implements IUserService {
 
 
     @Override
-    public User findUserByUsername(String username) {
+    public User findUserByUsername(String userName) {
         try{
-            return userRepository.findByUsername(username);
+            return userRepository.findByUsername(userName);
         } catch (Exception e) {
             throw new RuntimeException("Error finding user by username: " + e.getMessage(), e);
         }
@@ -55,13 +56,12 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUserById(Long id) {
-     try{
-            userRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting user: " + e.getMessage(), e);
-     }
-
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("User not found with id: " + id);
+        }
+        userRepository.deleteById(id);
     }
+
 
     @Override
     public User updateUser(Long userId, User user) {
