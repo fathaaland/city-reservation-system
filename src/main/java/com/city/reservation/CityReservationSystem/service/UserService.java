@@ -70,7 +70,11 @@ public class UserService implements IUserService {
 
     @Override
     public Iterable<User> getAllUsers() {
-        return null;
+        try{
+            return userRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting all users: " + e.getMessage(), e);
+        }
     }
 
     @Override

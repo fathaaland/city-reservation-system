@@ -74,5 +74,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/")
+    public ResponseEntity<Iterable<User>> getAllUsers() {
+        try{
+            Iterable<User> users = userService.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
 
 }
