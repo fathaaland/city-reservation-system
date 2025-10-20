@@ -136,6 +136,11 @@ public class ReservationService implements IReservationService  {
             Reservation existingReservation = reservationRepository.findById(reservationId)
                     .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
 
+            if (reservation.getStartTime().isAfter(reservation.getEndTime())) {
+                throw new RuntimeException("Start time must be before end time.");
+            }
+
+
             existingReservation.setStartTime(reservation.getStartTime());
             existingReservation.setEndTime(reservation.getEndTime());
 

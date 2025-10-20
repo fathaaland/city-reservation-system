@@ -114,5 +114,15 @@ public class ReservationController {
         }
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateReservation(@PathVariable Long id, @RequestBody Reservation reservationDetails) {
+        try {
+            Reservation updatedReservation = reservationService.updateReservation(id, reservationDetails);
+            return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update reservation: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 
 }
