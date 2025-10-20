@@ -44,7 +44,11 @@ public class UserService implements IUserService {
 
     @Override
     public User findUserByUsername(String username) {
-        return null;
+        try{
+            return userRepository.findByUsername(username);
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding user by username: " + e.getMessage(), e);
+        }
     }
 
 
