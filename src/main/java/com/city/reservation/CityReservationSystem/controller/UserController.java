@@ -42,4 +42,19 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<User> deleteUser(@PathVariable Long userId) {
+        try{
+            if(findUserById(userId) == null || userId <= 0) {
+                throw new EntityNotFoundException("User not found");
+            } else {
+                userService.deleteUserById(userId);
+                return ResponseEntity.ok().build();
+            }
+        } catch (Exception e) {
+            throw new EntityNotFoundException(e.getMessage());
+            }
+        }
+
     }

@@ -51,6 +51,11 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUserById(Long id) {
+     try{
+            userRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting user: " + e.getMessage(), e);
+     }
 
     }
 
