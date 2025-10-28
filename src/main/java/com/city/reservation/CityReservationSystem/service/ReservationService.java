@@ -155,10 +155,7 @@ public class ReservationService implements IReservationService  {
         return List.of();
     }
 
-    @Override
-    public Long countReservationsByUserId(Long userId, Long facilityId) {
-        return 0L;
-    }
+
 
     @Override
     public List<Reservation> getReservationsByUserIdAndDate(Long userId, String date) {
