@@ -125,4 +125,17 @@ public class ReservationController {
 
     }
 
+    @GetMapping("/date/{reservationDate}")
+    public ResponseEntity <List<Reservation>> getReservationsByDate(@PathVariable String reservationDate) {
+        try {
+            List<Reservation> reservations = reservationService.getReservationsByDate(reservationDate);
+            if (reservations.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(reservations);
+        }catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
