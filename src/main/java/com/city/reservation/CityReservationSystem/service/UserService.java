@@ -78,7 +78,7 @@ public class UserService implements IUserService {
     @Override
     public Iterable<User> getUsersByRole(String role, Pageable pageable) {
         try {
-            return userRepository.findByRole(Collections.singletonList(role), pageable);
+            return userRepository.findByRoleIn(Collections.singletonList(role), pageable);
         } catch (Exception e) {
             throw new RuntimeException("Error getting users by role: " + e.getMessage(), e);
         }
