@@ -85,12 +85,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Iterable<User> getUsersByName(String name) {
-        return null;
+    public Iterable<User> getUsersByEmail(String email) {
+        try {
+            User user = userRepository.findByEmail(email);
+
+            if (user == null) {
+                return Collections.emptyList();
+            }
+            return Collections.singleton(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting users by email: " + e.getMessage(), e);
+        }
     }
 
-    @Override
-    public Iterable<User> getUsersByEmail(String email) {
-        return null;
-    }
 }

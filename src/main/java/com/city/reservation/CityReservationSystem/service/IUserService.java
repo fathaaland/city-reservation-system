@@ -11,6 +11,5 @@ public interface IUserService {
     User updateUser(Long userId, User user);
     Iterable<User> getAllUsers();
     Iterable<User> getUsersByRole(String role, Pageable pageable);
-    Iterable<User> getUsersByName(String name);
     Iterable<User> getUsersByEmail(String email);
 }

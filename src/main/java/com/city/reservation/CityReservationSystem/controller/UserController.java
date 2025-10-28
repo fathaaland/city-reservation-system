@@ -95,4 +95,27 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/mail/{userMail}")
+    public ResponseEntity<Iterable<User>> getUsersByEmail(@PathVariable String userMail) {
+        try {
+            if (userMail == null || userMail.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Iterable<User> mailUser = userService.getUsersByEmail(userMail);
+
+            if (!mailUser.iterator().hasNext()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(mailUser);
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }
