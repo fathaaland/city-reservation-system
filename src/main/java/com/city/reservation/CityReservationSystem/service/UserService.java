@@ -4,14 +4,17 @@ import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
- private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
- public User createUser(User user) {
+    public User createUser(User user) {
         return User.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -21,38 +24,34 @@ public class UserService implements IUserService {
                 .build();
     }
 
-
     @Override
     public User addUser(User user) {
-     try{
-         User newUser = createUser(user);
-         return userRepository.save(newUser);
-     }catch(Exception e) {
-         throw new RuntimeException("Error adding user: " + e.getMessage(), e);
-     }
+        try {
+            User newUser = createUser(user);
+            return userRepository.save(newUser);
+        } catch (Exception e) {
+            throw new RuntimeException("Error adding user: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public User getUserById(Long id) {
-        try{
-            return userRepository.findById(id).orElse(null);
-
-    } catch (Exception e) {
+        try {
+            return userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        } catch (Exception e) {
             throw new RuntimeException("Error getting user: " + e.getMessage(), e);
         }
     }
 
-
     @Override
     public User findUserByUsername(String userName) {
-        try{
+        try {
             return userRepository.findByUsername(userName);
         } catch (Exception e) {
             throw new RuntimeException("Error finding user by username: " + e.getMessage(), e);
         }
     }
-
-
 
     @Override
     public void deleteUserById(Long id) {
@@ -62,7 +61,6 @@ public class UserService implements IUserService {
         userRepository.deleteById(id);
     }
 
-
     @Override
     public User updateUser(Long userId, User user) {
         return null;
@@ -70,7 +68,7 @@ public class UserService implements IUserService {
 
     @Override
     public Iterable<User> getAllUsers() {
-        try{
+        try {
             return userRepository.findAll();
         } catch (Exception e) {
             throw new RuntimeException("Error getting all users: " + e.getMessage(), e);
@@ -78,8 +76,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Iterable<User> getUsersByRole(String role) {
-        return null;
+    public Iterable<User> getUsersByRole(String role, Pageable pageable) {
+        try {
+            return userRepository.findByRole(Collections.singletonList(role), pageable);
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting users by role: " + e.getMessage(), e);
+        }
     }
 
     @Override

@@ -4,8 +4,6 @@ import com.city.reservation.CityReservationSystem.exceptions.EntityNotFoundExcep
 import com.city.reservation.CityReservationSystem.exceptions.IllegalArgumentException;
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.service.UserService;
-import com.city.reservation.CityReservationSystem.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +31,10 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<User> findUserById(@PathVariable Long userId) {
-        try{
+        try {
             if (userId <= 0) {
-            throw new IllegalArgumentException("Invalid user ID");
-        }
+                throw new IllegalArgumentException("Invalid user ID");
+            }
 
             User user = userService.getUserById(userId);
             return ResponseEntity.ok(user);
@@ -59,7 +57,6 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/by-username/{userName}")
     public ResponseEntity<User> findUserByUsername(@PathVariable String userName) {
         if (userName == null || userName.isEmpty()) {
@@ -76,7 +73,7 @@ public class UserController {
 
     @GetMapping("/")
     public ResponseEntity<Iterable<User>> getAllUsers() {
-        try{
+        try {
             Iterable<User> users = userService.getAllUsers();
             return ResponseEntity.ok(users);
         } catch (Exception e) {
@@ -84,4 +81,18 @@ public class UserController {
         }
     }
 
+    @GetMapping("/role/{userRole}")
+    public ResponseEntity<Iterable<User>> getUsersByRole(@PathVariable String userRole) {
+        try {
+            if (userRole == null || userRole.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Iterable<User> roleUsers = userService.getUsersByRole(userRole, null);
+            return ResponseEntity.ok(roleUsers);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
