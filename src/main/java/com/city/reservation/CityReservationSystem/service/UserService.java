@@ -1,6 +1,7 @@
 package com.city.reservation.CityReservationSystem.service;
 
 import com.city.reservation.CityReservationSystem.model.entity.User;
+import com.city.reservation.CityReservationSystem.model.enums.Role;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -62,9 +64,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User updateUser(Long userId, User user) {
-        return null;
+    public User patchUser(Long userId, Map<String, Object> updates) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "username" -> existingUser.setUsername((String) value);
+                case "email" -> existingUser.setEmail((String) value);
+                case "password" -> existingUser.setPassword((String) value);
+            }
+        });
+
+        return userRepository.save(existingUser);
     }
+
 
     @Override
     public Iterable<User> getAllUsers() {

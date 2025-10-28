@@ -5,8 +5,11 @@ import com.city.reservation.CityReservationSystem.exceptions.IllegalArgumentExce
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -117,5 +120,16 @@ public class UserController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PatchMapping("/update/{userId}")
+    public ResponseEntity<User> patchUser(@PathVariable Long userId, @RequestBody Map<String, Object> updates) {
+        try {
+            User updatedUser = userService.patchUser(userId, updates);
+            return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
 }
