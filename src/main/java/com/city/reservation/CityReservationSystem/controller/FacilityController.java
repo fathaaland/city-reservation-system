@@ -54,7 +54,7 @@ public class FacilityController {
         }
     }
 
-    @PutMapping("/update/{facilityId}")
+    @PatchMapping("/update/{facilityId}")
     public ResponseEntity<?> updateFacility(@PathVariable Long facilityId, @RequestBody SportFacility facility) {
         try {
             if (facilityId == null || facilityId <= 0 || facility == null) {

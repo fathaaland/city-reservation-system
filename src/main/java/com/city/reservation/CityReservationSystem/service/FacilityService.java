@@ -3,12 +3,14 @@ package com.city.reservation.CityReservationSystem.service;
 import com.city.reservation.CityReservationSystem.exceptions.BadRequestException;
 import com.city.reservation.CityReservationSystem.exceptions.EntityNotFoundException;
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
+import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.model.enums.SportType;
 import com.city.reservation.CityReservationSystem.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -53,20 +55,26 @@ public class FacilityService implements IFacilityService {
     }
 
     @Override
-    public SportFacility updateFacility(Long facilityId, SportFacility facility) {
+    public SportFacility updateFacility(Long facilityId, Map<String, Object> updates) {
         SportFacility existingFacility = facilityRepository.findById(facilityId)
                 .orElseThrow(() -> new EntityNotFoundException("Facility not found with id: " + facilityId));
 
-        existingFacility.setName(facility.getName());
-        existingFacility.setType(facility.getType());
-        existingFacility.setDescription(facility.getDescription());
-        existingFacility.setAddress(facility.getAddress());
-        existingFacility.setContactNumber(facility.getContactNumber());
-        existingFacility.setCapacity(facility.getCapacity());
-        existingFacility.setImageUrl(facility.getImageUrl());
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "name" -> existingFacility.setName((String) value);
+                case "type" -> existingFacility.setType((SportType) value);
+                case "description" -> existingFacility.setDescription((String) value);
+                case "address" -> existingFacility.setAddress((String) value);
+                case "contactNumber" -> existingFacility.setContactNumber((String) value);
+                case "capacity" -> existingFacility.setCapacity(Integer.parseInt(value.toString()));
+                case "imageUrl" -> existingFacility.setImageUrl((String) value);
+                default -> throw new IllegalArgumentException("Unknown field: " + key);
+            }
+        });
 
         return facilityRepository.save(existingFacility);
     }
+
 
     @Override
     public Iterable<SportFacility> getAllFacilities() {
