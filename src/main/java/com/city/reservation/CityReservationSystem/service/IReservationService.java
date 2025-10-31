@@ -13,7 +13,4 @@ public interface IReservationService {
     List<Reservation> getReservationsByUserId(Long userId);
     List<Reservation> getReservationsByFacilityId(Long facilityId);
     List<Reservation> getReservationsByDate(String date);
-    List<Reservation> getReservationsByUserIdAndFacilityId(Long userId, Long facilityId);
-    List<Reservation> getReservationsByUserIdAndDate(Long userId, String date);
-    List<Reservation> getReservationsByFacilityIdAndDate(Long facilityId, String date);
 }

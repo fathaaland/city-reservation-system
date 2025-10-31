@@ -152,22 +152,4 @@ public class ReservationService implements IReservationService  {
         }
     }
 
-    @Override
-    public List<Reservation> getReservationsByUserIdAndFacilityId(Long userId, Long facilityId) {
-        return List.of();
-    }
-
-
-
-    @Override
-    public List<Reservation> getReservationsByUserIdAndDate(Long userId, String date) {
-        return List.of();
-    }
-
-    @Override
-    public List<Reservation> getReservationsByFacilityIdAndDate(Long facilityId, String date) {
-        return List.of();
-    }
-
-
 }
