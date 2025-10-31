@@ -1,11 +1,15 @@
 package com.city.reservation.CityReservationSystem.service;
 
+import com.city.reservation.CityReservationSystem.exceptions.BadRequestException;
+import com.city.reservation.CityReservationSystem.exceptions.EntityNotFoundException;
 import com.city.reservation.CityReservationSystem.model.entity.Reservation;
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.repository.ReservationRepository;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.InternalException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import com.city.reservation.CityReservationSystem.repository.FacilityRepository;
 
@@ -27,9 +31,9 @@ public class ReservationService implements IReservationService  {
         Long facilityId = reservation.getSportFacility().getId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException ("User not found with id: " + userId));
         SportFacility sportFacility = FacilityRepository.findById(facilityId)
-                .orElseThrow(() -> new RuntimeException("Sport facility not found with id: " + facilityId));
+                .orElseThrow(() -> new EntityNotFoundException("Sport facility not found with id: " + facilityId));
 
         return Reservation.builder()
                 .user(user)
@@ -44,25 +48,19 @@ public class ReservationService implements IReservationService  {
     public Reservation addReservation(Reservation reservation) {
         try {
             Reservation newReservation = createReservation(reservation);
-
-
             return reservationRepository.save(newReservation);
         } catch (Exception e) {
-            throw new RuntimeException("Error adding reservation: " + e.getMessage(), e);
+            throw new InternalException("Error adding reservation: " + e.getMessage(), e);
         }
     }
 
     @Override
     public Reservation getReservationById(Long id) {
       try{
-          if (!reservationRepository.existsById(id)) {
-              throw new RuntimeException("Reservation not found with id: " + id);
-          }
-
             return reservationRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
     }catch (Exception e){
-            throw new RuntimeException("Error retrieving reservation with id: " + id + " - " + e.getMessage(), e);
+            throw new InternalException("Error retrieving reservation with id: " + id + " - " + e.getMessage(), e);
       }
     }
 
@@ -70,11 +68,11 @@ public class ReservationService implements IReservationService  {
     public void deleteReservationById(Long id) {
         try {
             if (!reservationRepository.existsById(id)) {
-                throw new RuntimeException("Reservation not found with id: " + id);
+                throw new EntityNotFoundException("Reservation not found with id: " + id);
             }
             reservationRepository.deleteById(id);
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting reservation with id: " + id + " - " + e.getMessage(), e);
+            throw new InternalException("Error deleting reservation with id: " + id + " - " + e.getMessage(), e);
         }
 
     }
@@ -83,12 +81,12 @@ public class ReservationService implements IReservationService  {
     public List<Reservation> getAllReservations() {
         try {
             if (reservationRepository.count() == 0) {
-                throw new RuntimeException("No reservations found.");
+                throw new EntityNotFoundException("No reservations found.");
             }
 
             return reservationRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Error retrieving all reservations: " + e.getMessage(), e);
+            throw new InternalException("Error retrieving all reservations: " + e.getMessage(), e);
         }
     }
 
@@ -96,11 +94,11 @@ public class ReservationService implements IReservationService  {
     public List<Reservation> getReservationsByUserId(Long userId) {
         try {
             if (!userRepository.existsById(userId)) {
-                throw new RuntimeException("User not found with id: " + userId);
+                throw new EntityNotFoundException("User not found with id: " + userId);
             }
             return reservationRepository.findByUserId(userId);
         } catch (Exception e) {
-            throw new RuntimeException("Error retrieving reservations for user with id: " + userId + " - " + e.getMessage(), e);
+            throw new InternalException("Error retrieving reservations for user with id: " + userId + " - " + e.getMessage(), e);
         }
     }
 
@@ -108,12 +106,12 @@ public class ReservationService implements IReservationService  {
     public List<Reservation> getReservationsByFacilityId(Long facilityId) {
         try{
             if(!FacilityRepository.existsById(facilityId)) {
-                throw new RuntimeException("Facility not found with id: " + facilityId);
+                throw new EntityNotFoundException("Facility not found with id: " + facilityId);
             }
 
             return reservationRepository.findBySportFacilityId(facilityId);
         }catch (Exception e) {
-            throw new RuntimeException("Error retrieving reservations for facility with id: " + facilityId + " - " + e.getMessage(), e);
+            throw new InternalException("Error retrieving reservations for facility with id: " + facilityId + " - " + e.getMessage(), e);
         }
     }
 
@@ -125,30 +123,26 @@ public class ReservationService implements IReservationService  {
 
             return reservationRepository.findByStartTimeBetween(startOfDay, endOfDay);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException("Error retrieving reservations by date " + date + " - " + e.getMessage());
         }
     }
 
     @Override
     public Reservation updateReservation(Long reservationId, Reservation reservation) {
         try {
-            if (!reservationRepository.existsById(reservationId)) {
-                throw new RuntimeException("Reservation not found with id: " + reservationId);
-            }
+
             Reservation existingReservation = reservationRepository.findById(reservationId)
-                    .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
+                    .orElseThrow(() -> new EntityNotFoundException("Reservation not found with id: " + reservationId));
 
             if (reservation.getStartTime().isAfter(reservation.getEndTime())) {
-                throw new RuntimeException("Start time must be before end time.");
+                throw new BadRequestException("Start time must be before end time.");
             }
-
-
             existingReservation.setStartTime(reservation.getStartTime());
             existingReservation.setEndTime(reservation.getEndTime());
 
             return reservationRepository.save(existingReservation);
         } catch (Exception e) {
-            throw new RuntimeException("Error updating reservation with id: " + reservationId + " - " + e.getMessage(), e);
+            throw new InternalException("Error updating reservation with id: " + reservationId + " - " + e.getMessage(), e);
         }
     }
 
