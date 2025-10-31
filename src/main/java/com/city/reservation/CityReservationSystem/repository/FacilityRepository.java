@@ -10,6 +10,4 @@ public interface FacilityRepository extends JpaRepository<SportFacility, Long> {
     boolean existsByName(String name);
 
     Iterable<SportFacility> findByType(SportType type);
-
-    boolean existsByType(SportType type);
 }
