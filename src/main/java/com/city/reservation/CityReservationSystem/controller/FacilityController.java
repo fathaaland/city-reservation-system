@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/facilities")
 @RequiredArgsConstructor
@@ -55,17 +57,20 @@ public class FacilityController {
     }
 
     @PatchMapping("/update/{facilityId}")
-    public ResponseEntity<?> updateFacility(@PathVariable Long facilityId, @RequestBody SportFacility facility) {
+    public ResponseEntity<?> updateFacility(@PathVariable Long facilityId, @RequestBody Map<String, Object> updates) {
         try {
-            if (facilityId == null || facilityId <= 0 || facility == null) {
+            if (facilityId == null || facilityId <= 0 || updates == null || updates.isEmpty()) {
                 return new ResponseEntity<>("Invalid input", HttpStatus.BAD_REQUEST);
             }
-            SportFacility updatedFacility = facilityService.updateFacility(facilityId, facility);
+
+            SportFacility updatedFacility = facilityService.updateFacility(facilityId, updates);
             return new ResponseEntity<>(updatedFacility, HttpStatus.OK);
+
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update facility: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllFacilities() {
