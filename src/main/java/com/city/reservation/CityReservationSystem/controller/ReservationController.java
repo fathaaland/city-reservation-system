@@ -5,6 +5,7 @@ import com.city.reservation.CityReservationSystem.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<?> addReservation(@RequestBody Reservation reservation) {
         if (reservation == null || reservation.getUser() == null || reservation.getSportFacility() == null ||
@@ -26,6 +28,7 @@ public class ReservationController {
         return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Reservation> getReservationById(@PathVariable Long id) {
         if (id == null || id <= 0) {
@@ -35,6 +38,7 @@ public class ReservationController {
         return new ResponseEntity<>(reservation, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteReservationById(@PathVariable Long id) {
         if (id == null || id <= 0) {
@@ -44,6 +48,7 @@ public class ReservationController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<Reservation>> getAllReservations() {
         List<Reservation> reservations = reservationService.getAllReservations();
@@ -53,6 +58,7 @@ public class ReservationController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable Long userId) {
         if (userId == null || userId <= 0) {
@@ -65,6 +71,7 @@ public class ReservationController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/facility/{facilityId}")
     public ResponseEntity<List<Reservation>> getReservationsByFacilityId(@PathVariable Long facilityId) {
         if (facilityId == null || facilityId <= 0) {
@@ -77,7 +84,8 @@ public class ReservationController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Reservation reservationDetails) {
         if (id == null || id <= 0 || reservationDetails == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -86,6 +94,7 @@ public class ReservationController {
         return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/date/{reservationDate}")
     public ResponseEntity<List<Reservation>> getReservationsByDate(@PathVariable String reservationDate) {
         List<Reservation> reservations = reservationService.getReservationsByDate(reservationDate);

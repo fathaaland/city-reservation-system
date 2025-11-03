@@ -6,6 +6,7 @@ import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private User createUser(User user) {
         if (user == null) {
@@ -25,7 +27,7 @@ public class UserService implements IUserService {
         return User.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .password(user.getPassword())
+                .password(passwordEncoder.encode(user.getPassword()))
                 .role(user.getRole())
                 .reservations(user.getReservations())
                 .build();
@@ -95,7 +97,7 @@ public class UserService implements IUserService {
             switch (key) {
                 case "username" -> existingUser.setUsername((String) value);
                 case "email" -> existingUser.setEmail((String) value);
-                case "password" -> existingUser.setPassword((String) value);
+                case "password" -> existingUser.setPassword(passwordEncoder.encode((String) value)); // <-- hash
                 default -> throw new IllegalArgumentException("Unknown field: " + key);
             }
         });
