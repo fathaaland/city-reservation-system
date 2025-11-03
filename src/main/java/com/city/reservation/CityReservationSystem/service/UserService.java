@@ -1,7 +1,7 @@
 package com.city.reservation.CityReservationSystem.service;
 
+import com.city.reservation.CityReservationSystem.exceptions.InternalServerException;
 import com.city.reservation.CityReservationSystem.model.entity.User;
-import com.city.reservation.CityReservationSystem.model.enums.Role;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +14,14 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
+
     private final UserRepository userRepository;
 
-    public User createUser(User user) {
+    private User createUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         return User.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -28,88 +33,110 @@ public class UserService implements IUserService {
 
     @Override
     public User addUser(User user) {
-        try {
-            User newUser = createUser(user);
-            return userRepository.save(newUser);
-        } catch (Exception e) {
-            throw new RuntimeException("Error adding user: " + e.getMessage(), e);
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
         }
+
+        User newUser = createUser(user);
+        return userRepository.save(newUser);
     }
 
     @Override
     public User getUserById(Long id) {
-        try {
-            return userRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting user: " + e.getMessage(), e);
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid user ID");
         }
+
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }
 
     @Override
     public User findUserByUsername(String userName) {
-        try {
-            return userRepository.findByUsername(userName);
-        } catch (Exception e) {
-            throw new RuntimeException("Error finding user by username: " + e.getMessage(), e);
+        if (userName == null || userName.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be empty");
         }
+
+        User user = userRepository.findByUsername(userName);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with username: " + userName);
+        }
+
+        return user;
     }
 
     @Override
     public void deleteUserById(Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid user ID");
+        }
+
         if (!userRepository.existsById(id)) {
             throw new EntityNotFoundException("User not found with id: " + id);
         }
+
         userRepository.deleteById(id);
     }
 
     @Override
     public User patchUser(Long userId, Map<String, Object> updates) {
+        if (userId == null || userId <= 0) {
+            throw new IllegalArgumentException("Invalid user ID");
+        }
+
+        if (updates == null || updates.isEmpty()) {
+            throw new IllegalArgumentException("No updates provided");
+        }
+
         User existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         updates.forEach((key, value) -> {
             switch (key) {
                 case "username" -> existingUser.setUsername((String) value);
                 case "email" -> existingUser.setEmail((String) value);
                 case "password" -> existingUser.setPassword((String) value);
+                default -> throw new IllegalArgumentException("Unknown field: " + key);
             }
         });
 
         return userRepository.save(existingUser);
     }
 
-
     @Override
     public Iterable<User> getAllUsers() {
-        try {
-            return userRepository.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting all users: " + e.getMessage(), e);
+        Iterable<User> users = userRepository.findAll();
+        if (!users.iterator().hasNext()) {
+            throw new EntityNotFoundException("No users found");
         }
+        return users;
     }
 
     @Override
     public Iterable<User> getUsersByRole(String role, Pageable pageable) {
-        try {
-            return userRepository.findByRoleIn(Collections.singletonList(role), pageable);
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting users by role: " + e.getMessage(), e);
+        if (role == null || role.isBlank()) {
+            throw new IllegalArgumentException("Role cannot be empty");
         }
+
+        Iterable<User> users = userRepository.findByRoleIn(Collections.singletonList(role), pageable);
+        if (!users.iterator().hasNext()) {
+            throw new EntityNotFoundException("No users found with role: " + role);
+        }
+
+        return users;
     }
 
     @Override
     public Iterable<User> getUsersByEmail(String email) {
-        try {
-            User user = userRepository.findByEmail(email);
-
-            if (user == null) {
-                return Collections.emptyList();
-            }
-            return Collections.singleton(user);
-        } catch (Exception e) {
-            throw new RuntimeException("Error getting users by email: " + e.getMessage(), e);
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email cannot be empty");
         }
-    }
 
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with email: " + email);
+        }
+
+        return Collections.singleton(user);
+    }
 }
