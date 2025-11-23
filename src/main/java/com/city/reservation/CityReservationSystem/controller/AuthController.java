@@ -1,17 +1,13 @@
 package com.city.reservation.CityReservationSystem.controller;
 
 import com.city.reservation.CityReservationSystem.model.entity.User;
-import com.city.reservation.CityReservationSystem.model.enums.Role;
-import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import com.city.reservation.CityReservationSystem.security.JwtUtil;
+import com.city.reservation.CityReservationSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -19,73 +15,93 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
-        String email = request.get("email");
-        String password = request.get("password");
-        String adminCode = request.get("adminCode");
+    public ResponseEntity<?> register(@RequestBody User user) {
+        try {
+            if (user.getUsername() == null || user.getUsername().isBlank() ||
+                    user.getPassword() == null || user.getPassword().isBlank() ||
+                    user.getEmail() == null || user.getEmail().isBlank()) {
+                return ResponseEntity.badRequest().body("Username, password and email are required");
+            }
 
-        if (username == null || password == null || email == null) {
-            return ResponseEntity.badRequest().body("Missing fields");
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            if (user.getRole() == null) {
+                user.setRole(com.city.reservation.CityReservationSystem.model.enums.Role.USER);
+            }
+
+            User createdUser = userService.addUser(user);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "User registered successfully",
+                    "userId", createdUser.getId(),
+                    "username", createdUser.getUsername()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
         }
-
-        Role role = "secret123".equals(adminCode) ? Role.ADMIN : Role.USER;
-
-        User newUser = User.builder()
-                .username(username)
-                .email(email)
-                .password(passwordEncoder.encode(password))
-                .role(role)
-                .build();
-
-        userRepository.save(newUser);
-        return ResponseEntity.ok("User registered with role: " + role);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
-        String password = request.get("password");
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
+        try {
+            String username = loginRequest.get("username");
+            String password = loginRequest.get("password");
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
+            if (username == null || password == null) {
+                return ResponseEntity.badRequest().body("Username and password are required");
+            }
 
-        User user = userRepository.findByUsername(username);
+            User user = userService.findUserByUsername(username);
 
-        String accessToken = jwtUtil.generateAccessToken(user);
-        String refreshToken = jwtUtil.generateRefreshToken(user);
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                String accessToken = jwtUtil.generateAccessToken(user);
+                String refreshToken = jwtUtil.generateRefreshToken(user);
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-
-        return ResponseEntity.ok(tokens);
+                return ResponseEntity.ok(Map.of(
+                        "accessToken", accessToken,
+                        "refreshToken", refreshToken,
+                        "tokenType", "Bearer",
+                        "expiresIn", 15 * 60, // 15 minut v sekundách
+                        "username", user.getUsername(),
+                        "role", user.getRole().name()
+                ));
+            } else {
+                return ResponseEntity.badRequest().body("Invalid credentials");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Login failed: " + e.getMessage());
+        }
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+        try {
+            String refreshToken = request.get("refreshToken");
 
-        if (!jwtUtil.isTokenValid(refreshToken)) {
-            return ResponseEntity.status(401).body("Invalid refresh token");
+            if (refreshToken == null) {
+                return ResponseEntity.badRequest().body("Refresh token is required");
+            }
+
+            if (!jwtUtil.isRefreshToken(refreshToken) || !jwtUtil.isTokenValid(refreshToken)) {
+                return ResponseEntity.badRequest().body("Invalid refresh token");
+            }
+
+            String newAccessToken = jwtUtil.refreshAccessToken(refreshToken);
+            String username = jwtUtil.extractUsername(refreshToken);
+
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", newAccessToken,
+                    "tokenType", "Bearer",
+                    "expiresIn", 15 * 60,
+                    "username", username
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Token refresh failed: " + e.getMessage());
         }
-
-        String username = jwtUtil.extractUsername(refreshToken);
-        User user = userRepository.findByUsername(username);
-
-        String newAccess = jwtUtil.generateAccessToken(user);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("accessToken", newAccess);
-        response.put("refreshToken", refreshToken);
-
-        return ResponseEntity.ok(response);
     }
 }

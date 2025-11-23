@@ -29,7 +29,7 @@ public class UserController {
         return ResponseEntity.ok(createdUser);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{userId}")
     public ResponseEntity<User> findUserById(@PathVariable Long userId) {
         if (userId == null || userId <= 0) {
@@ -40,7 +40,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         if (userId == null || userId <= 0) {
@@ -51,8 +51,7 @@ public class UserController {
         return ResponseEntity.ok("User deleted successfully");
     }
 
-
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/by-username/{userName}")
     public ResponseEntity<User> findUserByUsername(@PathVariable String userName) {
         if (userName == null || userName.isBlank()) {
@@ -63,14 +62,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<Iterable<User>> getAllUsers() {
         Iterable<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/role/{userRole}")
     public ResponseEntity<Iterable<User>> getUsersByRole(@PathVariable String userRole) {
         if (userRole == null || userRole.isBlank()) {
@@ -81,7 +80,7 @@ public class UserController {
         return ResponseEntity.ok(roleUsers);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/mail/{userMail}")
     public ResponseEntity<Iterable<User>> getUsersByEmail(@PathVariable String userMail) {
         if (userMail == null || userMail.isBlank()) {
@@ -92,7 +91,7 @@ public class UserController {
         return ResponseEntity.ok(mailUser);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/update/{userId}")
     public ResponseEntity<User> patchUser(@PathVariable Long userId, @RequestBody Map<String, Object> updates) {
         if (userId == null || userId <= 0) {
@@ -106,4 +105,5 @@ public class UserController {
         User updatedUser = userService.patchUser(userId, updates);
         return ResponseEntity.ok(updatedUser);
     }
+
 }

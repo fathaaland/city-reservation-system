@@ -17,7 +17,6 @@ import java.util.Map;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     private User createUser(User user) {
         if (user == null) {
@@ -27,7 +26,7 @@ public class UserService implements IUserService {
         return User.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .password(passwordEncoder.encode(user.getPassword()))
+                .password((user.getPassword()))
                 .role(user.getRole())
                 .reservations(user.getReservations())
                 .build();
@@ -97,7 +96,7 @@ public class UserService implements IUserService {
             switch (key) {
                 case "username" -> existingUser.setUsername((String) value);
                 case "email" -> existingUser.setEmail((String) value);
-                case "password" -> existingUser.setPassword(passwordEncoder.encode((String) value)); // <-- hash
+                case "password" -> existingUser.setPassword(((String) value));
                 default -> throw new IllegalArgumentException("Unknown field: " + key);
             }
         });

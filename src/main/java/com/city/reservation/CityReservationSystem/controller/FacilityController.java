@@ -18,7 +18,7 @@ public class FacilityController {
 
     private final FacilityService facilityService;
 
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<?> addFacility(@RequestBody SportFacility facility) {
         if (facility == null || facility.getName() == null || facility.getType() == null) {
@@ -28,7 +28,7 @@ public class FacilityController {
         return new ResponseEntity<>(createdFacility, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getFacilityById(@PathVariable Long id) {
         if (id == null || id <= 0) {
@@ -38,7 +38,7 @@ public class FacilityController {
         return new ResponseEntity<>(facility, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteFacilityById(@PathVariable Long id) {
         if (id == null || id <= 0) {
@@ -48,7 +48,7 @@ public class FacilityController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/update/{facilityId}")
     public ResponseEntity<?> updateFacility(@PathVariable Long facilityId, @RequestBody Map<String, Object> updates) {
         if (facilityId == null || facilityId <= 0 || updates == null || updates.isEmpty()) {
@@ -58,14 +58,14 @@ public class FacilityController {
         return new ResponseEntity<>(updatedFacility, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<?> getAllFacilities() {
         Iterable<SportFacility> facilities = facilityService.getAllFacilities();
         return new ResponseEntity<>(facilities, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/type/{type}")
     public ResponseEntity<?> getFacilitiesByType(@PathVariable SportType type) {
         if (type == null) {
@@ -75,7 +75,7 @@ public class FacilityController {
         return new ResponseEntity<>(facilities, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/name/{name}")
     public ResponseEntity<?> getFacilitiesByName(@PathVariable String name) {
         if (name == null || name.trim().isEmpty()) {

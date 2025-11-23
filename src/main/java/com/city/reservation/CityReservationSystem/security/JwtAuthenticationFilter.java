@@ -19,11 +19,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
-    private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
-
-
+    private final UserDetailsService userDetailsService;
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
@@ -32,13 +29,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            if (jwtUtil.isTokenValid(token)) {
-                String username = jwtUtil.extractUsername(token);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            try {
+                if (jwtUtil.isTokenValid(token) && jwtUtil.isAccessToken(token)) {
+                    String username = jwtUtil.extractUsername(token);
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            } catch (Exception e) {
+                logger.error("JWT processing error: " + e.getMessage());
             }
         }
 
