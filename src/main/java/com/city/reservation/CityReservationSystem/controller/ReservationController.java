@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reservation")
@@ -86,7 +87,7 @@ public class ReservationController {
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PatchMapping("/update/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Reservation reservationDetails) {
+    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Map<String, Object> reservationDetails) {
         if (id == null || id <= 0 || reservationDetails == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

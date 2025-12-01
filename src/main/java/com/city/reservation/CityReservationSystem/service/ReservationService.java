@@ -6,6 +6,7 @@ import com.city.reservation.CityReservationSystem.exceptions.InternalServerExcep
 import com.city.reservation.CityReservationSystem.model.entity.Reservation;
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
 import com.city.reservation.CityReservationSystem.model.entity.User;
+import com.city.reservation.CityReservationSystem.model.enums.SportType;
 import com.city.reservation.CityReservationSystem.repository.FacilityRepository;
 import com.city.reservation.CityReservationSystem.repository.ReservationRepository;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -142,25 +145,41 @@ public class ReservationService implements IReservationService {
     }
 
     @Override
-    public Reservation updateReservation(Long reservationId, Reservation reservation) {
-        if (reservationId == null || reservationId <= 0) {
-            throw new BadRequestException("Invalid reservation ID.");
-        }
-
+    public Reservation updateReservation(Long reservationId, Map<String, Object> updates) {
         Reservation existingReservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Reservation not found with id: " + reservationId));
 
-        if (reservation.getStartTime() == null || reservation.getEndTime() == null) {
-            throw new BadRequestException("Start and end times are required.");
-        }
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "startTime" -> {
+                    if (value instanceof String) {
+                        existingReservation.setStartTime(LocalDateTime.parse((String) value));
+                    } else if (value instanceof LocalDateTime) {
+                        existingReservation.setStartTime((LocalDateTime) value);
+                    } else {
+                        throw new IllegalArgumentException("Invalid format for startTime. Expected String or LocalDateTime.");
+                    }
+                }
+                case "endTime" -> {
+                    if (value instanceof String) {
+                        existingReservation.setEndTime(LocalDateTime.parse((String) value));
+                    } else if (value instanceof LocalDateTime) {
+                        existingReservation.setEndTime((LocalDateTime) value);
+                    } else {
+                        throw new IllegalArgumentException("Invalid format for endTime. Expected String or LocalDateTime.");
+                    }
+                }
+                default -> throw new IllegalArgumentException("Unknown field: " + key);
+            }
+        });
 
-        if (reservation.getStartTime().isAfter(reservation.getEndTime())) {
-            throw new BadRequestException("Start time must be before end time.");
+        if (existingReservation.getStartTime() != null && existingReservation.getEndTime() != null) {
+            if (existingReservation.getStartTime().isAfter(existingReservation.getEndTime())) {
+                throw new BadRequestException("Start time must be before end time.");
+            }
         }
-
-        existingReservation.setStartTime(reservation.getStartTime());
-        existingReservation.setEndTime(reservation.getEndTime());
 
         return reservationRepository.save(existingReservation);
     }
+
 }
