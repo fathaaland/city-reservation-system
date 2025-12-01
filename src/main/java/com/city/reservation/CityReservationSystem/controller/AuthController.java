@@ -30,8 +30,6 @@ public class AuthController {
             }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-
             user.setRole(Role.USER);
 
             User createdUser = userService.addUser(user);
@@ -66,7 +64,7 @@ public class AuthController {
                         "accessToken", accessToken,
                         "refreshToken", refreshToken,
                         "tokenType", "Bearer",
-                        "expiresIn", 15 * 60, // 15 minut v sekundách
+                        "expiresIn", 30 * 60, // 30 minut v sekundách
                         "username", user.getUsername(),
                         "role", user.getRole().name()
                 ));
@@ -91,13 +89,16 @@ public class AuthController {
                 return ResponseEntity.badRequest().body("Invalid refresh token");
             }
 
-            String newAccessToken = jwtUtil.refreshAccessToken(refreshToken);
             String username = jwtUtil.extractUsername(refreshToken);
+            User user = userService.findUserByUsername(username);
+
+            // generate me new access token
+            String newAccessToken = jwtUtil.generateAccessToken(user);
 
             return ResponseEntity.ok(Map.of(
                     "accessToken", newAccessToken,
                     "tokenType", "Bearer",
-                    "expiresIn", 15 * 60,
+                    "expiresIn", 30 * 60,
                     "username", username
             ));
         } catch (Exception e) {

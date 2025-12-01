@@ -1,11 +1,9 @@
 package com.city.reservation.CityReservationSystem.security;
 
 import com.city.reservation.CityReservationSystem.model.entity.User;
-import com.city.reservation.CityReservationSystem.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,16 +11,13 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
 public class JwtUtil {
-
-    private final UserService userService;
 
     @Value("${jwt.secret:kX8@mQ3#rT9$pL2%vN5&bH7*wZ4!jF6kX8@mQ3#rT9$pL2%vN5&bH7*wZ4!jF6x}")
     private String SECRET;
 
-    private static final long ACCESS_EXPIRATION = 1000 * 60 * 30;
-    private static final long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 7;
+    private static final long ACCESS_EXPIRATION = 1000 * 60 * 30; // 30 minut
+    private static final long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 7; // 7 dní
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
@@ -47,16 +42,6 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION))
                 .signWith(getSigningKey())
                 .compact();
-    }
-
-    public String refreshAccessToken(String refreshToken) {
-        if (!isRefreshToken(refreshToken) || !isTokenValid(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token");
-        }
-
-        String username = extractUsername(refreshToken);
-        User user = userService.findUserByUsername(username);
-        return generateAccessToken(user);
     }
 
     public boolean isRefreshToken(String token) {

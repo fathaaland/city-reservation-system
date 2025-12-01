@@ -17,6 +17,8 @@ import java.util.Map;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     private User createUser(User user) {
         if (user == null) {
@@ -96,7 +98,7 @@ public class UserService implements IUserService {
             switch (key) {
                 case "username" -> existingUser.setUsername((String) value);
                 case "email" -> existingUser.setEmail((String) value);
-                case "password" -> existingUser.setPassword(((String) value));
+                case "password" -> existingUser.setPassword(passwordEncoder.encode(existingUser.getPassword()));
                 default -> throw new IllegalArgumentException("Unknown field: " + key);
             }
         });
