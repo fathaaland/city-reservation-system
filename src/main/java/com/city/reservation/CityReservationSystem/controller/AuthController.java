@@ -1,6 +1,7 @@
 package com.city.reservation.CityReservationSystem.controller;
 
 import com.city.reservation.CityReservationSystem.model.entity.User;
+import com.city.reservation.CityReservationSystem.model.enums.Role;
 import com.city.reservation.CityReservationSystem.security.JwtUtil;
 import com.city.reservation.CityReservationSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,8 @@ public class AuthController {
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-            if (user.getRole() == null) {
-                user.setRole(com.city.reservation.CityReservationSystem.model.enums.Role.USER);
-            }
+
+            user.setRole(Role.USER);
 
             User createdUser = userService.addUser(user);
 
