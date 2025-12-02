@@ -39,8 +39,6 @@ public class UserController {
             throw new BadRequestException("Invalid user ID", HttpStatus.BAD_REQUEST);
         }
 
-
-
         User user = userService.getUserById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

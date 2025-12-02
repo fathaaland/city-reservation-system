@@ -1,11 +1,13 @@
 package com.city.reservation.CityReservationSystem.service;
 
 import com.city.reservation.CityReservationSystem.exceptions.InternalServerException;
+import com.city.reservation.CityReservationSystem.exceptions.ResourceNotFoundException;
 import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,12 +48,8 @@ public class UserService implements IUserService {
 
     @Override
     public User getUserById(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("Invalid user ID");
-        }
-
         return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
     }
 
     @Override
