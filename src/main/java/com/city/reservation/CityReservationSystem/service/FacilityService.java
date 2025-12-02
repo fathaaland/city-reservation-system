@@ -3,10 +3,10 @@ package com.city.reservation.CityReservationSystem.service;
 import com.city.reservation.CityReservationSystem.exceptions.BadRequestException;
 import com.city.reservation.CityReservationSystem.exceptions.EntityNotFoundException;
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
-import com.city.reservation.CityReservationSystem.model.entity.User;
 import com.city.reservation.CityReservationSystem.model.enums.SportType;
 import com.city.reservation.CityReservationSystem.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class FacilityService implements IFacilityService {
     @Override
     public SportFacility addFacility(SportFacility facility) {
         if (facility == null) {
-            throw new BadRequestException("Facility cannot be null.");
+            throw new BadRequestException("Facility cannot be null.", HttpStatus.BAD_REQUEST);
         }
 
         SportFacility newFacility = createFacility(facility);
@@ -85,7 +85,7 @@ public class FacilityService implements IFacilityService {
     public Iterable<SportFacility> getFacilitiesByType(SportType type) {
         var facilities = facilityRepository.findByType(type);
         if (facilities == null || !facilities.iterator().hasNext()) {
-            throw new BadRequestException("No facilities found for type: " + type);
+            throw new BadRequestException("No facilities found for type: " + type, HttpStatus.BAD_REQUEST);
         }
         return facilities;
     }
@@ -93,7 +93,7 @@ public class FacilityService implements IFacilityService {
     @Override
     public Iterable<SportFacility> getFacilitiesByName(String name) {
         if (!facilityRepository.existsByName(name)) {
-            throw new BadRequestException("No facilities found with name: " + name);
+            throw new BadRequestException("No facilities found with name: " + name, HttpStatus.BAD_REQUEST);
         }
         return Collections.singleton(facilityRepository.findByName(name));
     }

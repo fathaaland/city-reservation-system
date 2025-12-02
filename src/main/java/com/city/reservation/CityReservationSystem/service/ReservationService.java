@@ -2,21 +2,19 @@ package com.city.reservation.CityReservationSystem.service;
 
 import com.city.reservation.CityReservationSystem.exceptions.BadRequestException;
 import com.city.reservation.CityReservationSystem.exceptions.EntityNotFoundException;
-import com.city.reservation.CityReservationSystem.exceptions.InternalServerException;
 import com.city.reservation.CityReservationSystem.model.entity.Reservation;
 import com.city.reservation.CityReservationSystem.model.entity.SportFacility;
 import com.city.reservation.CityReservationSystem.model.entity.User;
-import com.city.reservation.CityReservationSystem.model.enums.SportType;
 import com.city.reservation.CityReservationSystem.repository.FacilityRepository;
 import com.city.reservation.CityReservationSystem.repository.ReservationRepository;
 import com.city.reservation.CityReservationSystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,18 +29,18 @@ public class ReservationService implements IReservationService {
 
     private Reservation createReservation(Reservation reservation) {
         if (reservation == null) {
-            throw new BadRequestException("Reservation cannot be null.");
+            throw new BadRequestException("Reservation cannot be null.", HttpStatus.BAD_REQUEST);
         }
 
         if (reservation.getUser() == null || reservation.getSportFacility() == null) {
-            throw new BadRequestException("Reservation must include user and facility.");
+            throw new BadRequestException("Reservation must include user and facility.", HttpStatus.BAD_REQUEST);
         }
 
         Long userId = reservation.getUser().getId();
         Long facilityId = reservation.getSportFacility().getId();
 
         if (userId == null || facilityId == null) {
-            throw new BadRequestException("User ID and Facility ID cannot be null.");
+            throw new BadRequestException("User ID and Facility ID cannot be null.", HttpStatus.BAD_REQUEST);
         }
 
         User user = userRepository.findById(userId)
@@ -52,11 +50,11 @@ public class ReservationService implements IReservationService {
                 .orElseThrow(() -> new EntityNotFoundException("Sport facility not found with id: " + facilityId));
 
         if (reservation.getStartTime() == null || reservation.getEndTime() == null) {
-            throw new BadRequestException("Start and end times are required.");
+            throw new BadRequestException("Start and end times are required.", HttpStatus.BAD_REQUEST);
         }
 
         if (reservation.getStartTime().isAfter(reservation.getEndTime())) {
-            throw new BadRequestException("Start time must be before end time.");
+            throw new BadRequestException("Start time must be before end time.", HttpStatus.BAD_REQUEST);
         }
 
         return Reservation.builder()
@@ -76,7 +74,7 @@ public class ReservationService implements IReservationService {
     @Override
     public Reservation getReservationById(Long id) {
         if (id == null || id <= 0) {
-            throw new BadRequestException("Invalid reservation ID.");
+            throw new BadRequestException("Invalid reservation ID.", HttpStatus.BAD_REQUEST);
         }
 
         return reservationRepository.findById(id)
@@ -86,7 +84,7 @@ public class ReservationService implements IReservationService {
     @Override
     public void deleteReservationById(Long id) {
         if (id == null || id <= 0) {
-            throw new BadRequestException("Invalid reservation ID.");
+            throw new BadRequestException("Invalid reservation ID.", HttpStatus.BAD_REQUEST);
         }
 
         if (!reservationRepository.existsById(id)) {
@@ -104,7 +102,7 @@ public class ReservationService implements IReservationService {
     @Override
     public List<Reservation> getReservationsByUserId(Long userId) {
         if (userId == null || userId <= 0) {
-            throw new BadRequestException("Invalid user ID.");
+            throw new BadRequestException("Invalid user ID.", HttpStatus.BAD_REQUEST);
         }
 
         if (!userRepository.existsById(userId)) {
@@ -117,7 +115,7 @@ public class ReservationService implements IReservationService {
     @Override
     public List<Reservation> getReservationsByFacilityId(Long facilityId) {
         if (facilityId == null || facilityId <= 0) {
-            throw new BadRequestException("Invalid facility ID.");
+            throw new BadRequestException("Invalid facility ID.", HttpStatus.BAD_REQUEST);
         }
 
         if (!facilityRepository.existsById(facilityId)) {
@@ -130,7 +128,7 @@ public class ReservationService implements IReservationService {
     @Override
     public List<Reservation> getReservationsByDate(String date) {
         if (date == null || date.isEmpty()) {
-            throw new BadRequestException("Date cannot be null or empty.");
+            throw new BadRequestException("Date cannot be null or empty.", HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -140,7 +138,7 @@ public class ReservationService implements IReservationService {
 
             return reservationRepository.findByStartTimeBetween(startOfDay, endOfDay);
         } catch (DateTimeParseException e) {
-            throw new BadRequestException("Invalid date format. Expected format: yyyy-MM-dd");
+            throw new BadRequestException("Invalid date format. Expected format: yyyy-MM-dd", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -175,7 +173,7 @@ public class ReservationService implements IReservationService {
 
         if (existingReservation.getStartTime() != null && existingReservation.getEndTime() != null) {
             if (existingReservation.getStartTime().isAfter(existingReservation.getEndTime())) {
-                throw new BadRequestException("Start time must be before end time.");
+                throw new BadRequestException("Start time must be before end time.", HttpStatus.BAD_REQUEST);
             }
         }
 
