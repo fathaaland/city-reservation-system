@@ -84,4 +84,11 @@ public class FacilityController {
         Iterable<SportFacility> facilities = facilityService.getFacilitiesByName(name);
         return new ResponseEntity<>(facilities, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping
+    public ResponseEntity<?> getAllFacilitiesAlias() {
+        return getAllFacilities();
+    }
+
 }
