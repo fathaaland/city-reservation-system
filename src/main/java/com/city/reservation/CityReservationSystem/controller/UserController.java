@@ -97,7 +97,7 @@ public class UserController {
         return new ResponseEntity<>(mailUser, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PatchMapping("/update/{userId}")
     public ResponseEntity<User> patchUser(@PathVariable Long userId, @RequestBody Map<String, Object> updates) {
         if (userId == null || userId <= 0) {
